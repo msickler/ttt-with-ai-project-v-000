@@ -11,71 +11,86 @@ class Game
   [2, 4, 6]
   ]
 
-  def initialize(player_1 = Players::Human.new("X"), player_2 = Players::Human.new("O"), board = Board.new)
-    @board = board
-    @player_1 = player_1
-    @player_2 = player_2
-  end
+  def initialize(player_1 = Players::Human.new("X") , player_2 = Players::Human.new("O"), board = Board.new)
+     @board = board
+     @player_1 = player_1
+     @player_2 = player_2
+   end
+ 
+   def over?
+     won? || draw?
+   end
 
-  def current_player
-   @board.turn_count % 2 == 0 ? player_1 : player_2
-  end
-
-  def won?
-  WIN_COMBINATIONS.each do |combo|
-    if @board.cells[combo[0]] == "X" && @board.cells[combo[1]] == "X" && @board.cells[combo[2]] == "X"
-      return combo
-    elsif @board.cells[combo[0]] == "O" && @board.cells[combo[1]] == "O" && @board.cells[combo[2]] == "O"
-      return combo
-    end
+   def turn_count
+     counter = 0
+ 
+     board.cells.each do |char|
+       if char == "X" || char == "O"
+       counter += 1
+       end
      end
-      false
-    end
-
- def draw?
-  !won? && @board.full?
-  end
-
-  def over?
-  won? || draw?
-  end
-
-  def winner
-    if won? && @board.cells[won?[0]] == "X"
-      "X"
-    elsif won? && @board.cells[won?[0]] == "O"
-      "O"
-    else nil
-    end
-  end
-
-  def turn
-    player = current_player.move(board)
-    if board.valid_move?(player)
-      board.update(player, current_player)
-      board.display
-    else
-      puts "Please enter 1-9:"
-      turn
-    end
-  end
-
-  def play
-    until over?
-      turn
-    end
-    if draw?
-      puts "Cat's Game!"
-    else won?
-      puts "Congratulations #{winner}!"
-
-    end
-
-
-  end
-
-
-
-
+     counter
+   end
+ 
+   def current_player
+     turn_count.even? ? player_1 : player_2
+   end
+ 
+   def winner
+     if won?
+       board.cells[won?[0]]
+     end
+   end
+ 
+   def turn
+     puts "Player #{current_player.token}, please enter a number 1-9:"
+ 
+     input = current_player.move(board)
+ 
+     if !board.valid_move?(input)
+       puts "That is not a valid move, try again."
+       board.display
+       turn
+     else
+       board.update(input, current_player)
+       board.display
+     end
+ 
+   end
+ 
+   def play
+     while !over?
+       turn
+     end
+     if won?
+       puts "Congratulations #{winner}!"
+     elsif draw?
+       puts "Cat's Game!"
+     end
+   end
+ 
+   def won?
+     WIN_COMBINATIONS.detect do |win_combination|
+       win_index_1 = win_combination[0]
+       win_index_2 = win_combination[1]
+       win_index_3 = win_combination[2]
+ 
+       position_1 = board.cells[win_index_1]
+       position_2 = board.cells[win_index_2]
+       position_3 = board.cells[win_index_3]
+ 
+       if position_1 == "X" && position_2 == "X" && position_3 == "X"
+         win_combination
+       elsif position_1 == "O" && position_2 == "O" && position_3 == "O"
+         win_combination
+       else
+         false
+       end
+     end
+   end
+ 
+   def draw?
+     !won? && board.full?
+   end
 
 end
