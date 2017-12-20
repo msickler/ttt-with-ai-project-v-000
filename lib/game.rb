@@ -16,14 +16,14 @@ class Game
      @player_1 = player_1
      @player_2 = player_2
    end
- 
+
    def over?
      won? || draw?
    end
 
    def turn_count
      counter = 0
- 
+
      board.cells.each do |char|
        if char == "X" || char == "O"
        counter += 1
@@ -31,22 +31,22 @@ class Game
      end
      counter
    end
- 
+
    def current_player
      turn_count.even? ? player_1 : player_2
    end
- 
+
    def winner
      if won?
        board.cells[won?[0]]
      end
    end
- 
+
    def turn
      puts "Player #{current_player.token}, please enter a number 1-9:"
- 
+
      input = current_player.move(board)
- 
+
      if !board.valid_move?(input)
        puts "That is not a valid move, try again."
        board.display
@@ -55,9 +55,9 @@ class Game
        board.update(input, current_player)
        board.display
      end
- 
+
    end
- 
+
    def play
      while !over?
        turn
@@ -68,17 +68,17 @@ class Game
        puts "Cat's Game!"
      end
    end
- 
+
    def won?
      WIN_COMBINATIONS.detect do |win_combination|
        win_index_1 = win_combination[0]
        win_index_2 = win_combination[1]
        win_index_3 = win_combination[2]
- 
+
        position_1 = board.cells[win_index_1]
        position_2 = board.cells[win_index_2]
        position_3 = board.cells[win_index_3]
- 
+
        if position_1 == "X" && position_2 == "X" && position_3 == "X"
          win_combination
        elsif position_1 == "O" && position_2 == "O" && position_3 == "O"
@@ -88,7 +88,7 @@ class Game
        end
      end
    end
- 
+
    def draw?
      !won? && board.full?
    end
